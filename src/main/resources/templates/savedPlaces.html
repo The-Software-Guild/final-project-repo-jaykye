@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Venue Explorer</title>
+</head>
+<body>
+
+<!-- Main Body of Page -->
+<div class="container">
+    <div class="row m-4">
+        <div class="col text-center border border-dark">
+            <h1><a href="/" style="color: #000000; text-decoration: none;">Venue Explorer</a></h1>
+        </div>
+    </div>
+
+    <div class="row m-4 border border-dark">
+        <div class="col text-center m-3">
+            <a href="search" class="btn btn-outline-primary btn-lg">Search Venues</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="nowTrending" class="btn btn-outline-primary btn-lg">Now Trending</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="recommendation" class="btn btn-outline-primary btn-lg">Recommendations</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="savedPlaces" class="btn btn-outline-primary btn-lg">Saved Places</a>
+        </div>
+    </div>
+
+    <!--  Search Field -  -->
+    <div class="row m-4 border border-dark">
+        <div class="row col-12 m-3">
+            <h4>Saved Places</h4>
+        </div>
+
+        <div class="row col text-center m-3">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+<!--                    <th>ID</th>-->
+                    <th>Venue name</th>
+                    <th>Category</th>
+                    <th>Venue Address</th>
+                    <th>Save</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="savedVenue : ${savedVenues}">
+                    <!--        여기 내용은 그냥 placehodler인가?-->
+<!--                    <td th:text="${savedVenue.id}">Venue Id</td>-->
+                    <td th:text="${savedVenue.name}">Name</td>
+                    <td th:text="${savedVenue.categories[0].name}">Category</td>
+                    <td th:text="${savedVenue.address}">Venue Address</td>
+                    <span th:switch="${savedVenue.isSavedFavorite}">
+                        <td th:case="${false}"><a href="#" th:href="@{/saveVenueInSavedPlaces(id=${savedVenue.id})}">Save</a></td>
+                        <td th:case="${true}"><a href="#" th:href="@{/unSaveVenueInSavedPlaces(id=${savedVenue.id})}">Unsave</a></td>
+                    </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p id="testid"></p>
+</div>
+<!-- End main body -->
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<!--on click sends the HttpServletRequest first, before the javascript runs.-->
+<script>
+$(document).ready(function () {
+    getLocation();
+});
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+  document.getElementById("testid").value = "Not working"
+  }
+}
+
+function showPosition(position) {
+  document.getElementById("latitudeId").value = position.coords.latitude;
+  document.getElementById("longitudeId").value = position.coords.longitude;
+}
+
+</script>
+</body>
+</html>

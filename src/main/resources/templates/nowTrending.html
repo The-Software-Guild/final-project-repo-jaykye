@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Venue Explorer</title>
+</head>
+<body>
+
+<!-- Main Body of Page -->
+<div class="container">
+    <div class="row m-4">
+        <div class="col text-center border border-dark">
+            <h1><a href="/" style="color: #000000; text-decoration: none;">Venue Explorer</a></h1>
+        </div>
+    </div>
+
+    <div class="row m-4 border border-dark">
+        <div class="col text-center m-3">
+            <a href="search" class="btn btn-outline-primary btn-lg">Search Venues</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="nowTrending" class="btn btn-outline-primary btn-lg">Now Trending</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="recommendation" class="btn btn-outline-primary btn-lg">Recommendations</a>
+        </div>
+        <div class="col text-center m-3">
+            <a href="savedPlaces" class="btn btn-outline-primary btn-lg">Saved Places</a>
+        </div>
+    </div>
+
+    <!--  Search Field -  -->
+    <div class="row m-4 border border-dark">
+        <div class="col-12 m-4">
+            <div class="col">
+                <span class="h3">Now Trending </span>
+            </div>
+            <div class="col">
+                <form action="searchTrendingVenues" method="POST">
+
+                    <div class="form-group row">
+                        <label for="cityName" class="col-6 col-form-label text-right">
+                            City</label>
+                        <div class="col-6">
+                            <div>
+                                <input type="text" name="cityName"
+                                       id="cityName" class="form-control col-6"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="searchMethod" class="col-6 col-form-label text-right">
+                            Select search method</label>
+                        <div class="col-6">
+                            <select id="searchMethod" name="searchMethod"
+                                    class="form-control col-6" >
+                                <option th:each="searchMethod : ${searchMethods}"
+                                        th:value="${searchMethod}"
+                                        th:text="${searchMethod}">
+                                    Search method</option>
+                            </select>
+                            <input type="hidden" id="latitudeId" name="latitude" value="11">
+                            <input type="hidden" id="longitudeId" name="longitude" value="11">
+                            <!--                    <button type="submit" class="btn btn-primary" onclick="getLocation()">Search Venues</button>-->
+                            <button type="submit" class="btn btn-primary m-3">Search Venues</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="row col text-center m-3">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+<!--                    <th>ID</th>-->
+                    <th>Venue name</th>
+                    <th>Category</th>
+                    <th>Venue Address</th>
+                    <th>Save</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="searchHistory : ${searchHistories}">
+                    <!--        여기 내용은 그냥 placehodler인가?-->
+<!--                    <td th:text="${searchHistory.venue.id}">Venue Id</td>-->
+                    <td th:text="${searchHistory.venue.name}">Name</td>
+
+                    <span th:if="${not #lists.isEmpty(searchHistory.venue.categories)}">
+                        <td th:text="${searchHistory.venue.categories[0].name}">Category</td>
+                    </span>
+                    <span th:unless="${not #lists.isEmpty(searchHistory.venue.categories)}">
+                        <td th:text="''">Category</td>
+                    </span>
+                    <td th:text="${searchHistory.venue.address}">Venue Address</td>
+                    <span th:switch="${searchHistory.venue.isSavedFavorite}">
+                        <td th:case="${false}"><a href="#" th:href="@{/saveTrendingVenue(id=${searchHistory.venue.id})}">Save</a></td>
+                        <td th:case="${true}"><a href="#" th:href="@{/unSaveTrendingVenue(id=${searchHistory.venue.id})}">Unsave</a></td>
+                    </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p id="testid"></p>
+</div>
+<!-- End main body -->
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<!--on click sends the HttpServletRequest first, before the javascript runs.-->
+<script>
+$(document).ready(function () {
+    getLocation();
+});
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+  document.getElementById("testid").value = "Not working"
+  }
+}
+
+function showPosition(position) {
+  document.getElementById("latitudeId").value = position.coords.latitude;
+  document.getElementById("longitudeId").value = position.coords.longitude;
+}
+
+</script>
+</body>
+</html>

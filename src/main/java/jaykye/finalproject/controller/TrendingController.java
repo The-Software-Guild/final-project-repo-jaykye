@@ -18,6 +18,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jaykye.finalproject.controller.myValidation.cityNameHasError;
+
 @Controller
 public class TrendingController {
     @Autowired
@@ -54,8 +56,17 @@ public class TrendingController {
 
         String searchMethod = request.getParameter("searchMethod");
         String locationQuery = "";
+        String cityName;
+
         if (searchMethod.equals("By City")) {
-            locationQuery += "near=" + request.getParameter("cityName");
+            cityName = request.getParameter("cityName");
+            locationQuery += "near=" + cityName;
+
+            // check if city is entered in the input.
+            if (cityNameHasError(cityName)) {
+                model.addAttribute("cityNameHasError", cityNameHasError(cityName));
+                return "nowTrending";
+            }
         }
         else if (searchMethod.equals("Near me")){
             // Near me
